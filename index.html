@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2D7A22">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="THN Sales">
+<meta name="mobile-web-app-capable" content="yes">
+<title>THN Sales</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --g:#2D7A22;--g2:#1a5214;--gl:#EAF3DE;--gl2:#C0DD97;
+  --or:#E8701A;--orl:#FEF3EC;
+  --red:#DC2626;--redl:#FEE2E2;--redm:#B91C1C;
+  --blue:#1D6FB8;--bluel:#EBF3FF;
+  --amber:#B45309;--amberl:#FEF3C7;
+  --bg:#F4F5F7;--surface:#fff;--border:#E1E4EA;
+  --text:#1A1D23;--muted:#6B7280;--hint:#9CA3AF;
+  --r6:6px;--r8:8px;--r12:12px;--r16:16px;
+  --nav-h:60px;--header-h:56px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'Inter',sans-serif;color:var(--text);font-size:14px;line-height:1.5;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;box-shadow:0 0 40px rgba(0,0,0,.15)}
+
+/* TOP HEADER */
+#header{background:var(--g);color:#fff;height:var(--header-h);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;padding-top:env(safe-area-inset-top,0)}
+.hd-back{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;display:none;align-items:center}
+.hd-back.show{display:flex}
+.hd-title{font-size:16px;font-weight:600;color:#fff;flex:1}
+.hd-sub{font-size:11px;color:rgba(255,255,255,.7)}
+.hd-right{margin-left:auto;display:flex;gap:4px}
+.hd-btn{background:rgba(255,255,255,.15);border:none;border-radius:var(--r8);width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;cursor:pointer;position:relative}
+.hd-btn:active{background:rgba(255,255,255,.25)}
+.notif-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:#EF4444}
+
+/* SCROLL AREA */
+#scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 8px)}
+
+/* BOTTOM NAV */
+#bottom-nav{background:var(--surface);border-top:1px solid var(--border);height:var(--nav-h);display:flex;align-items:stretch;flex-shrink:0;padding-bottom:var(--safe-bottom)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--muted);transition:.12s;border:none;background:none;padding:6px 4px;position:relative}
+.nav-item.active{color:var(--g)}
+.nav-item i{font-size:22px}
+.nav-item span{font-size:10px;font-weight:500}
+.nav-badge{position:absolute;top:4px;right:18px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:10px;min-width:14px;text-align:center}
+
+/* PAGES */
+.page{display:none;padding:16px}.page.active{display:block}
+.subpage{display:none}.subpage.active{display:block}
+
+/* SECTION HEADER */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:15px;font-weight:700;color:var(--text)}
+.sec-link{font-size:12.5px;color:var(--g);font-weight:500}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--r12);border:1px solid var(--border);margin-bottom:12px;overflow:hidden}
+.card-pad{padding:14px}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{background:var(--surface);border-radius:var(--r12);padding:14px;border:1px solid var(--border)}
+.stat-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:700;line-height:1}
+.stat-val.g{color:var(--g)}.stat-val.r{color:var(--red)}.stat-val.a{color:var(--amber)}.stat-val.b{color:var(--blue)}
+.stat-trend{font-size:11px;margin-top:3px;color:var(--muted)}
+.stat-trend.up{color:#059669}
+
+/* LIST ITEMS */
+.list-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:.1s;background:var(--surface)}
+.list-item:last-child{border-bottom:none}
+.list-item:active{background:#f8f9fa}
+.li-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.li-avatar.g{background:var(--gl);color:#27500A}.li-avatar.b{background:var(--bluel);color:var(--blue)}
+.li-avatar.a{background:var(--amberl);color:var(--amber)}.li-avatar.r{background:var(--redl);color:var(--redm)}
+.li-avatar.p{background:#F5F3FF;color:#6D28D9}
+.li-content{flex:1;min-width:0}
+.li-name{font-size:13.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-sub{font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-right{flex-shrink:0;text-align:right}
+.li-val{font-size:13px;font-weight:600;color:var(--text)}
+.li-meta{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.badge.g{background:var(--gl);color:#27500A}.badge.r{background:var(--redl);color:var(--redm)}
+.badge.a{background:var(--amberl);color:var(--amber)}.badge.b{background:var(--bluel);color:var(--blue)}
+.badge.gr{background:#F1F2F4;color:var(--muted)}.badge.p{background:#F5F3FF;color:#6D28D9}
+.badge.t{background:#F0FDFA;color:#0F766E}
+
+/* PROGRESS */
+.prog{height:4px;border-radius:2px;background:var(--border);overflow:hidden;margin-top:5px}
+.prog-f{height:100%;border-radius:2px}
+.prog-f.g{background:var(--g)}.prog-f.a{background:var(--or)}.prog-f.r{background:var(--red)}.prog-f.b{background:var(--blue)}
+
+/* ALERTS */
+.alert{display:flex;gap:8px;padding:10px 12px;border-radius:var(--r8);margin-bottom:8px;font-size:12.5px;align-items:flex-start}
+.alert.r{background:var(--redl);color:var(--redm);border:1px solid #FCA5A5}
+.alert.a{background:var(--amberl);color:var(--amber);border:1px solid #FCD34D}
+.alert.g{background:var(--gl);color:#27500A;border:1px solid var(--gl2)}
+.alert.b{background:var(--bluel);color:var(--blue);border:1px solid #93C5FD}
+.alert i{font-size:15px;flex-shrink:0;margin-top:1px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:var(--r8);font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);transition:.12s;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--g);color:#fff;border-color:var(--g)}
+.btn.r{background:var(--red);color:#fff;border-color:var(--red)}
+.btn.b{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.full{width:100%}
+.btn i{font-size:16px}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.btn-row .btn{flex:1}
+
+/* FORM */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.3px}
+.form-control{width:100%;border:1.5px solid var(--border);border-radius:var(--r8);padding:11px 12px;font-size:14px;color:var(--text);background:var(--surface);outline:none;font-family:inherit;-webkit-appearance:none}
+.form-control:focus{border-color:var(--g)}
+select.form-control{cursor:pointer}
+
+/* BOTTOM SHEET */
+#sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;opacity:0;pointer-events:none;transition:opacity .25s}
+#sheet-bg.open{opacity:1;pointer-events:all}
+#sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:var(--surface);border-radius:20px 20px 0 0;z-index:81;transition:transform .3s cubic-bezier(.32,.72,0,1);padding-bottom:calc(var(--safe-bottom) + 16px)}
+#sheet.open{transform:translateX(-50%) translateY(0)}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 0}
+.sheet-hd{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.sheet-title{font-size:15px;font-weight:700}
+.sheet-close{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer}
+.sheet-body{padding:16px;max-height:70vh;overflow-y:auto}
+
+/* CHECK-IN BUTTON */
+.checkin-btn{width:100%;padding:18px;background:var(--g);border:none;border-radius:var(--r12);color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:.15s;font-family:inherit}
+.checkin-btn:active{transform:scale(.97);background:var(--g2)}
+.checkin-btn.checked{background:#059669}
+
+/* KANBAN PILLS */
+.status-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.status-tabs::-webkit-scrollbar{display:none}
+.status-tab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:600;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;white-space:nowrap}
+.status-tab.active{background:var(--g);color:#fff;border-color:var(--g)}
+
+/* ORDER STEPPER */
+.stepper{display:flex;align-items:center;margin:12px 0}
+.step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;top:13px;left:50%;width:100%;height:2px;background:var(--border)}
+.step:not(:last-child).done::after{background:var(--g)}
+.step-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);z-index:1}
+.step-dot.done{background:var(--g);border-color:var(--g);color:#fff}
+.step-dot.active{background:#fff;border-color:var(--g);color:var(--g)}
+.step-label{font-size:9.5px;color:var(--muted);text-align:center;white-space:nowrap}
+.step.done .step-label,.step.active .step-label{color:var(--g)}
+
+/* DEBT BAR */
+.debt-row{margin-bottom:12px}
+.debt-meta{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+.debt-bar{height:8px;border-radius:4px;background:var(--border);overflow:hidden}
+.debt-fill{height:100%;border-radius:4px}
+
+/* KPI RING */
+.kpi-card{background:var(--surface);border-radius:var(--r12);border:1px solid var(--border);padding:16px;text-align:center;margin-bottom:12px}
+.kpi-num{font-size:42px;font-weight:700;line-height:1;color:var(--g)}
+.kpi-label{font-size:12px;color:var(--muted);margin-top:4px}
+.kpi-sub{font-size:13px;color:var(--text);margin-top:6px}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(var(--nav-h) + 16px);left:50%;transform:translateX(-50%);background:#1C2B1A;color:#fff;padding:10px 18px;border-radius:var(--r8);font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;z-index:99;white-space:nowrap;pointer-events:none;max-width:90vw}
+
+/* INSTALL BANNER */
+#install-banner{background:var(--g);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;display:none}
+#install-banner.show{display:flex}
+.install-text{flex:1;font-size:12.5px}
+.install-btn{background:#fff;color:var(--g);border:none;border-radius:var(--r6);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+.install-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer}
+
+/* PLAN ITEM */
+.plan-item{background:var(--surface);border-radius:var(--r8);border:1px solid var(--border);padding:12px;margin-bottom:8px}
+.plan-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.plan-title{font-size:13.5px;font-weight:600;color:var(--text)}
+.plan-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+
+<div id="install-banner">
+  <i style="font-size:22px" class="ti ti-download"></i>
+  <div class="install-text"><b>Cài THN Sales về điện thoại</b><br>Dùng như app thật, không cần mạng</div>
+  <button class="install-btn" id="install-btn">Cài đặt</button>
+  <button class="install-close" onclick="document.getElementById('install-banner').classList.remove('show')">✕</button>
+</div>
+
+<div id="header">
+  <button class="hd-back" id="hd-back" onclick="goBack()"><i class="ti ti-arrow-left"></i></button>
+  <div>
+    <div class="hd-title" id="hd-title">THN Sales</div>
+    <div class="hd-sub" id="hd-sub">Xin chào, Nguyễn Thành 👋</div>
+  </div>
+  <div class="hd-right">
+    <button class="hd-btn" onclick="showSheet('sheet-notif')"><i class="ti ti-bell"></i><span class="notif-dot"></span></button>
+    <button class="hd-btn" onclick="showSheet('sheet-profile')"><i class="ti ti-user-circle"></i></button>
+  </div>
+</div>
+
+<div id="scroll-area">
+
+  <!-- ══ HOME ══ -->
+  <div id="page-home" class="page active">
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-label">Doanh số tháng 6</div><div class="stat-val g">1,84 tỷ</div><div class="stat-trend up">↑ 12% vs T5</div></div>
+      <div class="stat"><div class="stat-label">Chờ duyệt</div><div class="stat-val a">5 đơn</div><div class="stat-trend">Cần xử lý</div></div>
+      <div class="stat"><div class="stat-label">KPI tháng 6</div><div class="stat-val g">82%</div><div class="stat-trend up">Còn 21 ngày</div></div>
+      <div class="stat"><div class="stat-label">Thăm viếng HN</div><div class="stat-val">7/12</div><div class="stat-trend">Còn 5 điểm</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-pad" style="padding-bottom:8px">
+        <div class="sec-hd"><span class="sec-title">Cần xử lý ngay</span></div>
+      </div>
+      <div class="alert r" style="margin:0 14px 8px"><i class="ti ti-x-circle"></i><div><b>CH Phước Lộc:</b> Nợ quá hạn 65 ngày · Cấm bán</div></div>
+      <div class="alert a" style="margin:0 14px 8px"><i class="ti ti-clock"></i><div><b>5 đơn hàng</b> chờ duyệt · Lâu nhất 45 phút</div></div>
+      <div class="alert a" style="margin:0 14px 14px"><i class="ti ti-tool"></i><div><b>4 phiếu bảo hành</b> quá hạn phản hồi</div></div>
+    </div>
+
+    <div class="sec-hd"><span class="sec-title">Truy cập nhanh</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+      <div onclick="navTo('customers')" style="background:var(--surface);border-radius:var(--r12);border:1px solid var(--border);padding:14px 8px;text-align:center;cursor:pointer">
+        <i class="ti ti-users" style="font-size:24px;color:var(--g);display:block;margin-bottom:5px"></i>
+        <div style="font-size:11px;font-weight:600;color:var(--text)">Khách hàng</div>
+      </div>
+      <div onclick="navTo('orders')" style="background:var(--surface);border-radius:var(--r12);border:1px solid var(--border);padding:14px 8px;text-align:center;cursor:pointer;position:relative">
+        <i class="ti ti-shopping-cart" style="font-size:24px;color:var(--or);display:block;margin-bottom:5px"></i>
+        <div style="font-size:11px;font-weight:600;color:var(--text)">Đặt hàng</div>
+        <span style="position:absolute;top:8px;right:8px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px">5</span>
+      </div>
+      <div onclick="navTo('market')" style="background:var(--surface);border-radius:var(--r12);border:1px solid var(--border);padding:14px 8px;text-align:center;cursor:pointer">
+        <i class="ti ti-map-pin" style="font-size:24px;color:var(--blue);display:block;margin-bottom:5px"></i>
+        <div style="font-size:11px;font-weight:600;color:var(--text)">Thị trường</div>
+      </div>
+      <div onclick="navTo('kpi')" style="background:var(--surface);border-radius:var(--r12);border:1px solid var(--border);padding:14px 8px;text-align:center;cursor:pointer">
+        <i class="ti ti-trophy" style="font-size:24px;color:var(--amber);display:block;margin-bottom:5px"></i>
+        <div style="font-size:11px;font-weight:600;color:var(--text)">KPI</div>
+      </div>
+    </div>
+
+    <div class="sec-hd"><span class="sec-title">Đơn hàng gần nhất</span><span class="sec-link" onclick="navTo('orders')">Xem tất cả</span></div>
+    <div class="card">
+      <div class="list-item" onclick="showSheet('sheet-order-detail')">
+        <div class="li-avatar b" style="border-radius:var(--r8)"><i class="ti ti-shopping-cart" style="font-size:16px"></i></div>
+        <div class="li-content"><div class="li-name">#DH0642 · CH Vân – Cần Thơ</div><div class="li-sub">Bình xịt × 20, Đầu xịt × 30</div></div>
+        <div class="li-right"><div class="li-val">8,3tr</div><span class="badge a">Chờ duyệt</span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-avatar g" style="border-radius:var(--r8)"><i class="ti ti-shopping-cart" style="font-size:16px"></i></div>
+        <div class="li-content"><div class="li-name">#DH0641 · CH Lâm Đồng</div><div class="li-sub">Máy cắt cỏ TL-33N × 5</div></div>
+        <div class="li-right"><div class="li-val">12,5tr</div><span class="badge a">Chờ duyệt</span></div>
+      </div>
+      <div class="list-item">
+        <div class="li-avatar g" style="border-radius:var(--r8)"><i class="ti ti-check" style="font-size:16px"></i></div>
+        <div class="li-content"><div class="li-name">#DH0635 · CH Đức Tiệp</div><div class="li-sub">Máy phát điện × 2</div></div>
+        <div class="li-right"><div class="li-val">24tr</div><span class="badge g">Hoàn thành</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CUSTOMERS ══ -->
+  <div id="page-customers" class="page">
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <div style="flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r8);padding:10px 12px;display:flex;align-items:center;gap:8px">
+        <i class="ti ti-search" style="color:var(--muted);font-size:16px"></i>
+        <input type="text" placeholder="Tìm khách hàng..." style="border:none;outline:none;font-size:14px;width:100%;background:transparent;font-family:inherit">
+      </div>
+      <button class="btn p" onclick="showSheet('sheet-new-customer')" style="padding:10px 14px"><i class="ti ti-plus"></i></button>
+    </div>
+    <div class="status-tabs">
+      <div class="status-tab active">Tất cả (247)</div>
+      <div class="status-tab">Cấp 1 (42)</div>
+      <div class="status-tab">Cấp 2 (96)</div>
+      <div class="status-tab">NPP (12)</div>
+      <div class="status-tab">VIP (8)</div>
+      <div class="status-tab">Cảnh báo (7)</div>
+    </div>
+    <div class="card">
+      <div class="list-item" onclick="showSheet('sheet-customer-detail')">
+        <div class="li-avatar g">VT</div>
+        <div class="li-content"><div class="li-name">CH Vân – Tân Tiến, Cần Thơ</div><div class="li-sub">Đại lý Cấp 1 · 0901 234 567</div></div>
+        <div class="li-right"><span class="badge g">VIP ★</span><div class="li-meta">35,2/100tr</div></div>
+      </div>
+      <div class="list-item">
+        <div class="li-avatar a">CL</div>
+        <div class="li-content"><div class="li-name">CH Chiêu Ly – Q.Ngãi</div><div class="li-sub">NPP · 0905 678 901</div></div>
+        <div class="li-right"><span class="badge a">Gần hạn</span><div class="li-meta">78/80tr</div></div>
+      </div>
+      <div class="list-item">
+        <div class="li-avatar r">TH</div>
+        <div class="li-content"><div class="li-name">CH Thảo – Phước Lộc, HCM</div><div class="li-sub">Đại lý Cấp 2 · 0912 345 678</div></div>
+        <div class="li-right"><span class="badge r">Cấm bán</span><div class="li-meta" style="color:var(--red)">Quá hạn 65ng</div></div>
+      </div>
+      <div class="list-item">
+        <div class="li-avatar b">VY</div>
+        <div class="li-content"><div class="li-name">CH Vy – Châu Mai Tý, Đắk Lắk</div><div class="li-sub">Đại lý Cấp 1 · VIP</div></div>
+        <div class="li-right"><span class="badge g">Bình thường</span><div class="li-meta">42,5/120tr</div></div>
+      </div>
+      <div class="list-item">
+        <div class="li-avatar p">DT</div>
+        <div class="li-content"><div class="li-name">CH Đức Tiệp – Quảng Ninh</div><div class="li-sub">Đại lý Cấp 1</div></div>
+        <div class="li-right"><span class="badge g">Bình thường</span><div class="li-meta">22/90tr</div></div>
+      </div>
+      <div class="list-item">
+        <div class="li-avatar g">ST</div>
+        <div class="li-content"><div class="li-name">CH Sáng Tú – Lâm Đồng</div><div class="li-sub">Đại lý Cấp 3</div></div>
+        <div class="li-right"><span class="badge gr">Bình thường</span><div class="li-meta">8/30tr</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MARKET ══ -->
+  <div id="page-market" class="page">
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-label">Kế hoạch hôm nay</div><div class="stat-val">12 điểm</div></div>
+      <div class="stat"><div class="stat-label">Đã thăm</div><div class="stat-val g">7</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-pad" style="padding-bottom:8px"><div class="sec-title">Lịch thăm viếng – 09/06</div></div>
+      <div class="list-item" onclick="showSheet('sheet-visit')">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-check" style="font-size:14px;color:#fff"></i></div>
+        <div class="li-content"><div class="li-name">CH Vân – Tân Tiến, Cần Thơ</div><div class="li-sub">08:00 · Check-in 08:05 · Đặt hàng 8,3tr</div></div>
+        <span class="badge g">Xong</span>
+      </div>
+      <div class="list-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-check" style="font-size:14px;color:#fff"></i></div>
+        <div class="li-content"><div class="li-name">CH Vy – Châu Mai Tý, Đắk Lắk</div><div class="li-sub">09:30 · Check-in 09:42</div></div>
+        <span class="badge g">Xong</span>
+      </div>
+      <div class="list-item" onclick="showSheet('sheet-checkin')">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--or);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-player-play" style="font-size:12px;color:#fff"></i></div>
+        <div class="li-content"><div class="li-name">CH Sáng Tú – Lâm Đồng</div><div class="li-sub">11:00 · Đang thăm viếng</div></div>
+        <span class="badge a">Đang thăm</span>
+      </div>
+      <div class="list-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:var(--muted)">4</div>
+        <div class="li-content"><div class="li-name">CH Thanh Huyền – Nghệ An</div><div class="li-sub">14:00 · Chưa check-in</div></div>
+        <span class="badge gr">Chưa đến</span>
+      </div>
+      <div class="list-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:var(--muted)">5</div>
+        <div class="li-content"><div class="li-name">CH Đức Tiệp – Quảng Ninh</div><div class="li-sub">15:30 · Chưa check-in</div></div>
+        <span class="badge gr">Chưa đến</span>
+      </div>
+    </div>
+
+    <button class="checkin-btn" id="checkin-main" onclick="doCheckin()">
+      <i class="ti ti-map-pin" style="font-size:20px"></i>
+      Check-in GPS tại điểm hiện tại
+    </button>
+  </div>
+
+  <!-- ══ ORDERS ══ -->
+  <div id="page-orders" class="page">
+    <button class="btn p full" onclick="showSheet('sheet-new-order')" style="margin-bottom:14px"><i class="ti ti-plus"></i>Tạo đơn hàng mới</button>
+
+    <div class="status-tabs">
+      <div class="status-tab active" onclick="filterOrders('all',this)">Tất cả</div>
+      <div class="status-tab" onclick="filterOrders('pending',this)">Chờ duyệt (5)</div>
+      <div class="status-tab" onclick="filterOrders('shipping',this)">Đang xuất</div>
+      <div class="status-tab" onclick="filterOrders('done',this)">Hoàn thành</div>
+    </div>
+
+    <div class="card" id="order-list">
+      <div class="list-item order-item" data-status="pending" onclick="showSheet('sheet-order-detail')">
+        <div class="li-avatar b" style="border-radius:var(--r8);font-size:11px;font-weight:700">#42</div>
+        <div class="li-content"><div class="li-name">CH Vân – Cần Thơ</div><div class="li-sub">Bình xịt × 20, Đầu xịt × 30</div></div>
+        <div class="li-right"><div class="li-val">8,3tr</div><span class="badge a">Chờ duyệt</span></div>
+      </div>
+      <div class="list-item order-item" data-status="pending">
+        <div class="li-avatar a" style="border-radius:var(--r8);font-size:11px;font-weight:700">#41</div>
+        <div class="li-content"><div class="li-name">CH Sáng Tú – Lâm Đồng</div><div class="li-sub">Máy cắt cỏ TL-33N × 5</div></div>
+        <div class="li-right"><div class="li-val">12,5tr</div><span class="badge a">Chờ duyệt</span></div>
+      </div>
+      <div class="list-item order-item" data-status="shipping">
+        <div class="li-avatar b" style="border-radius:var(--r8);font-size:11px;font-weight:700">#38</div>
+        <div class="li-content"><div class="li-name">CH Vân – Cần Thơ</div><div class="li-sub">Bình xịt × 30</div></div>
+        <div class="li-right"><div class="li-val">7,5tr</div><span class="badge b">Đang xuất</span></div>
+      </div>
+      <div class="list-item order-item" data-status="done">
+        <div class="li-avatar g" style="border-radius:var(--r8);font-size:11px;font-weight:700">#35</div>
+        <div class="li-content"><div class="li-name">CH Đức Tiệp – Q.Ninh</div><div class="li-sub">Máy phát điện × 2</div></div>
+        <div class="li-right"><div class="li-val">24tr</div><span class="badge g">Hoàn thành</span></div>
+      </div>
+      <div class="list-item order-item" data-status="done">
+        <div class="li-avatar g" style="border-radius:var(--r8);font-size:11px;font-weight:700">#28</div>
+        <div class="li-content"><div class="li-name">CH Thanh Huyền – N.An</div><div class="li-sub">Bình xịt Bunny × 30</div></div>
+        <div class="li-right"><div class="li-val">9tr</div><span class="badge g">Hoàn thành</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ KPI + PLAN ══ -->
+  <div id="page-kpi" class="page">
+    <div class="kpi-card">
+      <div class="kpi-num">82%</div>
+      <div class="kpi-label">KPI tháng 6 của bạn</div>
+      <div class="prog" style="height:8px;margin-top:12px"><div class="prog-f g" style="width:82%"></div></div>
+      <div class="kpi-sub">Doanh số: <b>1,84 tỷ</b> / Mục tiêu: <b>2,25 tỷ</b></div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-label">Lượt thăm viếng</div><div class="stat-val b">32/45</div><div class="stat-trend">Còn 13 lượt</div></div>
+      <div class="stat"><div class="stat-label">Đơn hàng</div><div class="stat-val g">68/80</div><div class="stat-trend">Còn 12 đơn</div></div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:4px"><span class="sec-title">Kế hoạch tháng 6</span><button class="btn p" onclick="showSheet('sheet-new-plan')" style="padding:6px 12px;font-size:12px"><i class="ti ti-plus"></i>Thêm</button></div>
+    <div class="plan-item">
+      <div class="plan-hd"><div><div class="plan-title">Thăm 15 KH Cấp 1 tại HCM</div><div class="plan-meta">Sale: N.Thành · Hạn: 30/06</div></div><span class="badge g">Đúng tiến độ</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Tiến độ</span><span style="font-weight:600;color:var(--g)">13/15</span></div>
+      <div class="prog"><div class="prog-f g" style="width:87%"></div></div>
+    </div>
+    <div class="plan-item">
+      <div class="plan-hd"><div><div class="plan-title">Giới thiệu SP mới Presmax MAX-20BD</div><div class="plan-meta">Sale: M.Linh · Hạn: 15/06</div></div><span class="badge a">Chậm tiến độ</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Tiến độ</span><span style="font-weight:600;color:var(--or)">6/10</span></div>
+      <div class="prog"><div class="prog-f a" style="width:60%"></div></div>
+    </div>
+    <div class="plan-item">
+      <div class="plan-hd"><div><div class="plan-title">Thu hồi công nợ quá hạn Q1</div><div class="plan-meta">Sale: M.Linh · Hạn: 20/06</div></div><span class="badge r">Cần hỗ trợ</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--muted)">Tiến độ</span><span style="font-weight:600;color:var(--red)">2/5 KH</span></div>
+      <div class="prog"><div class="prog-f r" style="width:40%"></div></div>
+    </div>
+
+    <div class="sec-hd" style="margin-top:16px"><span class="sec-title">Top Sale tháng 6</span></div>
+    <div class="card">
+      <div class="list-item">
+        <div style="font-size:18px;font-weight:700;color:var(--or);width:28px;flex-shrink:0">#1</div>
+        <div class="li-avatar g">NT</div>
+        <div class="li-content"><div class="li-name">Nguyễn Thành</div><div class="li-sub">Chi nhánh HCM</div></div>
+        <div class="li-right"><div class="li-val">680tr</div><div class="li-meta" style="color:var(--g);font-weight:600">94% KPI</div></div>
+      </div>
+      <div class="list-item">
+        <div style="font-size:18px;font-weight:700;color:var(--muted);width:28px;flex-shrink:0">#2</div>
+        <div class="li-avatar b">ML</div>
+        <div class="li-content"><div class="li-name">Mai Linh</div><div class="li-sub">Chi nhánh HCM</div></div>
+        <div class="li-right"><div class="li-val">540tr</div><div class="li-meta" style="color:var(--g);font-weight:600">82% KPI</div></div>
+      </div>
+      <div class="list-item">
+        <div style="font-size:18px;font-weight:700;color:var(--muted);width:28px;flex-shrink:0">#3</div>
+        <div class="li-avatar a">TH</div>
+        <div class="li-content"><div class="li-name">Trung Hiếu</div><div class="li-sub">Chi nhánh Hà Nội</div></div>
+        <div class="li-right"><div class="li-val">385tr</div><div class="li-meta" style="color:var(--amber);font-weight:600">61% KPI</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end scroll-area -->
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <button class="nav-item active" onclick="navTo('home',this)"><i class="ti ti-home"></i><span>Trang chủ</span></button>
+  <button class="nav-item" onclick="navTo('customers',this)"><i class="ti ti-users"></i><span>KH</span></button>
+  <button class="nav-item" onclick="navTo('market',this)"><i class="ti ti-map-pin"></i><span>Thị trường</span></button>
+  <button class="nav-item" onclick="navTo('orders',this)"><i class="ti ti-shopping-cart"></i><span>Đơn hàng</span><span class="nav-badge">5</span></button>
+  <button class="nav-item" onclick="navTo('kpi',this)"><i class="ti ti-trophy"></i><span>KPI</span></button>
+</div>
+
+<!-- ══════ BOTTOM SHEETS ══════ -->
+
+<!-- Notification -->
+<div id="sheet-bg" onclick="closeSheet()"></div>
+<div id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-hd">
+    <span class="sheet-title" id="sheet-title">Thông báo</span>
+    <button class="sheet-close" onclick="closeSheet()">✕</button>
+  </div>
+  <div class="sheet-body" id="sheet-body"></div>
+</div>
+
+<!-- SHEET CONTENTS (templates) -->
+<template id="tpl-notif">
+  <div class="alert r"><i class="ti ti-x-circle"></i><div><b>CH Phước Lộc:</b> Nợ quá hạn 65 ngày · Tạm cấm bán</div></div>
+  <div class="alert a"><i class="ti ti-clock"></i><div><b>5 đơn hàng</b> chờ duyệt – lâu nhất 45 phút</div></div>
+  <div class="alert a"><i class="ti ti-tool"></i><div><b>4 phiếu bảo hành</b> quá hạn phản hồi</div></div>
+  <div class="alert b"><i class="ti ti-refresh"></i><div>ERP đồng bộ lần cuối: <b>08:30</b> · 12 bản ghi mới</div></div>
+</template>
+
+<template id="tpl-profile">
+  <div style="text-align:center;padding:8px 0 16px">
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--gl);color:#27500A;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px">NT</div>
+    <div style="font-size:16px;font-weight:700">Nguyễn Thành</div>
+    <div style="font-size:13px;color:var(--muted)">Sale · Chi nhánh TP.HCM</div>
+  </div>
+  <div class="card">
+    <div class="list-item"><i class="ti ti-user" style="font-size:18px;color:var(--muted)"></i><div class="li-content"><div class="li-name">Hồ sơ cá nhân</div></div><i class="ti ti-chevron-right" style="color:var(--hint)"></i></div>
+    <div class="list-item"><i class="ti ti-bell" style="font-size:18px;color:var(--muted)"></i><div class="li-content"><div class="li-name">Thông báo</div></div><i class="ti ti-chevron-right" style="color:var(--hint)"></i></div>
+    <div class="list-item"><i class="ti ti-refresh" style="font-size:18px;color:var(--muted)"></i><div class="li-content"><div class="li-name">Đồng bộ dữ liệu</div><div class="li-sub">Lần cuối: 08:30 hôm nay</div></div><i class="ti ti-chevron-right" style="color:var(--hint)"></i></div>
+    <div class="list-item" style="color:var(--red)"><i class="ti ti-logout" style="font-size:18px"></i><div class="li-content"><div class="li-name" style="color:var(--red)">Đăng xuất</div></div></div>
+  </div>
+</template>
+
+<template id="tpl-customer-detail">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+    <div class="li-avatar g" style="width:52px;height:52px;font-size:16px">VT</div>
+    <div><div style="font-size:16px;font-weight:700">CH Vân – Tân Tiến, Cần Thơ</div><div style="font-size:13px;color:var(--muted)">Đại lý Cấp 1 · VIP ★</div></div>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:14px"><span class="badge g">VIP ★</span><span class="badge b">Cấp 1</span><span class="badge g">Luôn được bán</span></div>
+  <div style="background:var(--bg);border-radius:var(--r8);padding:12px;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="text-align:center"><div style="font-size:13px;color:var(--muted)">Hạn mức</div><div style="font-size:18px;font-weight:700">100tr</div></div>
+      <div style="text-align:center"><div style="font-size:13px;color:var(--muted)">Dư nợ</div><div style="font-size:18px;font-weight:700;color:var(--g)">35,2tr</div></div>
+    </div>
+    <div class="prog" style="height:6px;margin-top:10px"><div class="prog-f g" style="width:35%"></div></div>
+    <div style="font-size:11px;color:var(--muted);text-align:right;margin-top:3px">35% hạn mức · Còn 64,8tr</div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="list-item" style="padding:10px 14px"><span style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Điện thoại</span><span style="font-weight:500">0901 234 567</span></div>
+    <div class="list-item" style="padding:10px 14px"><span style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Sale phụ trách</span><span style="font-weight:500">Nguyễn Thành</span></div>
+    <div class="list-item" style="padding:10px 14px"><span style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Hạn thanh toán</span><span style="font-weight:500">30 ngày</span></div>
+    <div class="list-item" style="padding:10px 14px"><span style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Lần mua gần nhất</span><span style="font-weight:500">09/06 · 8,3tr</span></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn p" onclick="closeSheet();showSheet('sheet-new-order')"><i class="ti ti-shopping-cart"></i>Tạo đơn</button>
+    <button class="btn"><i class="ti ti-phone"></i>Gọi điện</button>
+    <button class="btn"><i class="ti ti-edit"></i>Sửa</button>
+  </div>
+</template>
+
+<template id="tpl-order-detail">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div><div style="font-size:16px;font-weight:700">#DH0642</div><div style="font-size:13px;color:var(--muted)">09/06/2025 09:45 · Sale: N.Thành</div></div>
+    <span class="badge a">Chờ duyệt</span>
+  </div>
+  <div class="stepper">
+    <div class="step done"><div class="step-dot done">✓</div><div class="step-label">Tạo đơn</div></div>
+    <div class="step done"><div class="step-dot done">✓</div><div class="step-label">Kiểm tra CN</div></div>
+    <div class="step active"><div class="step-dot active">3</div><div class="step-label">Chờ duyệt</div></div>
+    <div class="step"><div class="step-dot">4</div><div class="step-label">Xuất kho</div></div>
+    <div class="step"><div class="step-dot">5</div><div class="step-label">Hoàn tất</div></div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="padding:10px 14px;border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Sản phẩm</div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)"><span>Bình xịt TL-20BD × 20</span><span style="font-weight:600">5.000.000 đ</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid var(--border)"><span>Đầu xịt Yataka CS-29 × 30</span><span style="font-weight:600">3.600.000 đ</span></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;color:var(--g)"><span>CK thương mại (3%)</span><span style="font-weight:600">-258.000 đ</span></div>
+    </div>
+    <div style="padding:10px 14px;display:flex;justify-content:space-between"><span style="font-weight:700">Tổng cộng</span><span style="font-size:16px;font-weight:700;color:var(--text)">8.342.000 đ</span></div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn p" style="flex:1" onclick="doApprove()"><i class="ti ti-check"></i>Duyệt đơn</button>
+    <button class="btn r" style="flex:1" onclick="closeSheet()"><i class="ti ti-x"></i>Từ chối</button>
+  </div>
+</template>
+
+<template id="tpl-new-order">
+  <div class="form-group"><label class="form-label">Khách hàng</label>
+    <select class="form-control" onchange="checkCust(this)">
+      <option value="">-- Chọn khách hàng --</option>
+      <option value="ok">CH Vân – Cần Thơ (Cấp 1 · VIP)</option>
+      <option value="warn">CH Minh Sơn – Q.Ngãi (NPP · Gần hạn)</option>
+      <option value="block">CH Phước Lộc – HCM (CẤM BÁN)</option>
+    </select>
+  </div>
+  <div id="cust-check"></div>
+  <div class="form-group"><label class="form-label">Sản phẩm</label>
+    <select class="form-control">
+      <option>Bình xịt Mitsuyama TL-20BD – 250.000đ</option>
+      <option>Đầu xịt Yataka CS-29 – 120.000đ</option>
+      <option>Máy cắt cỏ TL-33N – 2.500.000đ</option>
+    </select>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="form-group"><label class="form-label">Số lượng</label><input type="number" class="form-control" value="10" min="1"></div>
+    <div class="form-group"><label class="form-label">Kho xuất</label><select class="form-control"><option>Kho HCM</option><option>Kho HN</option><option>Kho ĐN</option></select></div>
+  </div>
+  <div style="background:var(--gl);border-radius:var(--r8);padding:12px;margin-bottom:14px;font-size:13px;color:#27500A">
+    <div style="display:flex;justify-content:space-between"><span>Trước CK</span><span>2.500.000 đ</span></div>
+    <div style="display:flex;justify-content:space-between"><span>CK thương mại 3%</span><span>-75.000 đ</span></div>
+    <div style="display:flex;justify-content:space-between;font-weight:700;margin-top:4px;padding-top:4px;border-top:1px solid var(--gl2)"><span>Tổng cộng</span><span>2.425.000 đ</span></div>
+  </div>
+  <div class="form-group"><label class="form-label">Hình thức thanh toán</label><select class="form-control"><option>Công nợ 30 ngày</option><option>Công nợ 7 ngày</option><option>Tiền mặt</option></select></div>
+  <div class="btn-row">
+    <button class="btn" onclick="closeSheet()">Hủy</button>
+    <button class="btn p" onclick="doSubmitOrder()"><i class="ti ti-send"></i>Gửi duyệt</button>
+  </div>
+</template>
+
+<template id="tpl-checkin">
+  <div style="text-align:center;padding:8px 0">
+    <div style="font-size:48px;margin-bottom:8px">📍</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:4px">CH Sáng Tú – Lâm Đồng</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px">Đang thăm viếng · Check-in lúc 11:22</div>
+    <div style="background:var(--gl);border-radius:var(--r8);padding:10px;font-size:12.5px;color:#27500A;margin-bottom:16px">
+      <i class="ti ti-map-pin"></i> GPS: 11.945°N, 108.442°E<br><span style="color:var(--muted)">Xác nhận vị trí đúng địa điểm KH</span>
+    </div>
+  </div>
+  <div class="form-group"><label class="form-label">Kết quả thăm viếng</label>
+    <select class="form-control"><option>Đặt hàng</option><option>Hẹn lại</option><option>Không gặp</option><option>Từ chối</option></select>
+  </div>
+  <div class="form-group"><label class="form-label">Ghi chú</label><textarea class="form-control" rows="3" placeholder="Nhu cầu, phản hồi sản phẩm..."></textarea></div>
+  <div class="btn-row">
+    <button class="btn" onclick="closeSheet()">Đóng</button>
+    <button class="btn p" onclick="doCheckout()"><i class="ti ti-logout"></i>Check-out & Lưu</button>
+  </div>
+</template>
+
+<template id="tpl-visit">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+    <div class="li-avatar g">VT</div>
+    <div><div style="font-size:15px;font-weight:700">CH Vân – Tân Tiến, Cần Thơ</div><div style="font-size:12px;color:var(--muted)">Thăm viếng 09/06 · 08:00 – 09:30</div></div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="list-item" style="padding:10px 14px"><span style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Check-in</span><span style="font-weight:500;color:var(--g)">08:05 · GPS xác nhận</span></div>
+    <div class="list-item" style="padding:10px 14px"><span style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Check-out</span><span style="font-weight:500">09:28</span></div>
+    <div class="list-item" style="padding:10px 14px"><span style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Kết quả</span><span style="font-weight:500">Đặt hàng 8,3tr</span></div>
+    <div class="list-item" style="padding:10px 14px"><span style="font-size:12px;color:var(--muted);width:90px;flex-shrink:0">Ghi chú</span><span style="font-size:12.5px">KH hỏi thêm về SP Presmax mới. Sẽ đặt thêm tuần sau.</span></div>
+  </div>
+  <button class="btn full" onclick="closeSheet()">Đóng</button>
+</template>
+
+<template id="tpl-new-customer">
+  <div class="form-group"><label class="form-label">Tên cửa hàng</label><input type="text" class="form-control" placeholder="Nhập tên..."></div>
+  <div class="form-group"><label class="form-label">Người liên hệ</label><input type="text" class="form-control" placeholder="Chủ cửa hàng..."></div>
+  <div class="form-group"><label class="form-label">Điện thoại</label><input type="tel" class="form-control" placeholder="0900 000 000"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="form-group"><label class="form-label">Loại KH</label>
+      <select class="form-control"><option>Đại lý Cấp 1</option><option>Đại lý Cấp 2</option><option>Đại lý Cấp 3</option><option>NPP</option><option>KH lẻ</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Hạn mức (đ)</label><input type="text" class="form-control" placeholder="50000000"></div>
+  </div>
+  <div class="form-group"><label class="form-label">Tỉnh / Thành phố</label><input type="text" class="form-control" placeholder="TP.HCM, Hà Nội..."></div>
+  <div class="btn-row">
+    <button class="btn" onclick="closeSheet()">Hủy</button>
+    <button class="btn p" onclick="toast('Thêm khách hàng thành công!');closeSheet()"><i class="ti ti-check"></i>Thêm KH</button>
+  </div>
+</template>
+
+<template id="tpl-new-plan">
+  <div class="form-group"><label class="form-label">Tên hoạt động</label><input type="text" class="form-control" placeholder="Vd: Thăm 10 KH Cấp 1..."></div>
+  <div class="form-group"><label class="form-label">Loại kế hoạch</label>
+    <select class="form-control"><option>Thăm viếng thị trường</option><option>Phát triển KH mới</option><option>Thu hồi công nợ</option><option>Demo sản phẩm</option></select>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div class="form-group"><label class="form-label">Mục tiêu (số)</label><input type="number" class="form-control" placeholder="10"></div>
+    <div class="form-group"><label class="form-label">Hạn hoàn thành</label><input type="date" class="form-control"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn" onclick="closeSheet()">Hủy</button>
+    <button class="btn p" onclick="toast('Đã thêm kế hoạch!');closeSheet()"><i class="ti ti-check"></i>Thêm</button>
+  </div>
+</template>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.js"></script>
+<script>
+// PWA Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// Install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').classList.add('show');
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const {outcome} = await deferredPrompt.userChoice;
+    if(outcome==='accepted') document.getElementById('install-banner').classList.remove('show');
+    deferredPrompt = null;
+  }
+});
+
+// Navigation
+let history = [];
+function navTo(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else {
+    const navBtns = document.querySelectorAll('.nav-item');
+    const map = {home:0,customers:1,market:2,orders:3,kpi:4};
+    if(map[id]!==undefined) navBtns[map[id]].classList.add('active');
+  }
+  const titles = {home:'THN Sales',customers:'Khách hàng',market:'Thị trường',orders:'Đơn hàng',kpi:'KPI & Kế hoạch'};
+  const subs = {home:'Xin chào, Nguyễn Thành 👋',customers:'247 khách hàng',market:'Lịch thăm viếng hôm nay',orders:'Quản lý & duyệt đơn',kpi:'Tháng 6/2025'};
+  document.getElementById('hd-title').textContent = titles[id]||id;
+  document.getElementById('hd-sub').textContent = subs[id]||'';
+  document.getElementById('scroll-area').scrollTop = 0;
+  closeSheet();
+}
+
+function goBack(){
+  if(history.length) navTo(history.pop());
+}
+
+// Sheet system
+const sheets = {
+  'sheet-notif': {title:'Thông báo', tpl:'tpl-notif'},
+  'sheet-profile': {title:'Tài khoản', tpl:'tpl-profile'},
+  'sheet-customer-detail': {title:'Hồ sơ khách hàng', tpl:'tpl-customer-detail'},
+  'sheet-order-detail': {title:'Chi tiết đơn hàng', tpl:'tpl-order-detail'},
+  'sheet-new-order': {title:'Tạo đơn hàng', tpl:'tpl-new-order'},
+  'sheet-checkin': {title:'Check-in thăm viếng', tpl:'tpl-checkin'},
+  'sheet-visit': {title:'Kết quả thăm viếng', tpl:'tpl-visit'},
+  'sheet-new-customer': {title:'Thêm khách hàng', tpl:'tpl-new-customer'},
+  'sheet-new-plan': {title:'Thêm kế hoạch', tpl:'tpl-new-plan'},
+};
+
+function showSheet(id){
+  const cfg = sheets[id];
+  if(!cfg) return;
+  document.getElementById('sheet-title').textContent = cfg.title;
+  const tpl = document.getElementById(cfg.tpl);
+  document.getElementById('sheet-body').innerHTML = tpl ? tpl.innerHTML : '';
+  document.getElementById('sheet-bg').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+}
+
+function closeSheet(){
+  document.getElementById('sheet-bg').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+}
+
+// Order filter
+function filterOrders(status, btn){
+  document.querySelectorAll('.status-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.order-item').forEach(row=>{
+    row.style.display = (status==='all' || row.dataset.status===status) ? '' : 'none';
+  });
+}
+
+// Check customer
+function checkCust(sel){
+  const box = document.getElementById('cust-check');
+  if(!box) return;
+  const v = sel.value;
+  if(!v){box.innerHTML='';return;}
+  if(v==='ok') box.innerHTML='<div class="alert g" style="margin-bottom:10px"><i class="ti ti-check"></i><div>KH hợp lệ · Dư nợ 35,2/100tr · Giá VIP · HT 30 ngày</div></div>';
+  else if(v==='warn') box.innerHTML='<div class="alert a" style="margin-bottom:10px"><i class="ti ti-alert-circle"></i><div>Cảnh báo: Công nợ 97% hạn mức. Đơn mới có thể bị từ chối.</div></div>';
+  else box.innerHTML='<div class="alert r" style="margin-bottom:10px"><i class="ti ti-x-circle"></i><div>CẤM BÁN – Nợ quá hạn 65 ngày. Không được tạo đơn.</div></div>';
+}
+
+// Actions
+function doCheckin(){
+  const btn = document.getElementById('checkin-main');
+  btn.innerHTML='<i class="ti ti-check" style="font-size:20px"></i> Check-in thành công · 11:22';
+  btn.classList.add('checked');
+  toast('Check-in GPS thành công tại CH Sáng Tú');
+}
+
+function doCheckout(){
+  closeSheet();
+  toast('Check-out thành công · Đã lưu kết quả thăm viếng');
+}
+
+function doApprove(){
+  closeSheet();
+  toast('✓ Đơn #DH0642 đã được duyệt');
+}
+
+function doSubmitOrder(){
+  closeSheet();
+  toast('Đơn hàng đã gửi duyệt thành công');
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(()=>{ t.style.opacity='0'; }, 2800);
+}
+
+// Swipe to close sheet
+let touchStartY = 0;
+document.getElementById('sheet').addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; });
+document.getElementById('sheet').addEventListener('touchmove', e => {
+  const dy = e.touches[0].clientY - touchStartY;
+  if(dy > 60) closeSheet();
+});
+</script>
+</body>
+</html>
